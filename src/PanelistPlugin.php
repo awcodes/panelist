@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Panelist;
 
 use Filament\Contracts\Plugin;
@@ -7,6 +9,19 @@ use Filament\Panel;
 
 class PanelistPlugin implements Plugin
 {
+    public static function make(): static
+    {
+        return app(static::class);
+    }
+
+    public static function get(): static
+    {
+        /** @var static $plugin */
+        $plugin = filament(app(static::class)->getId());
+
+        return $plugin;
+    }
+
     public function getId(): string
     {
         return 'panelist';
@@ -20,18 +35,5 @@ class PanelistPlugin implements Plugin
     public function boot(Panel $panel): void
     {
         //
-    }
-
-    public static function make(): static
-    {
-        return app(static::class);
-    }
-
-    public static function get(): static
-    {
-        /** @var static $plugin */
-        $plugin = filament(app(static::class)->getId());
-
-        return $plugin;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Panelist;
 
 use Awcodes\Panelist\Commands\PanelistCommand;

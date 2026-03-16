@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Panelist\Tests;
 
 use Awcodes\Panelist\PanelistServiceProvider;
@@ -35,6 +37,11 @@ class TestCase extends Orchestra
         );
     }
 
+    public function getEnvironmentSetUp($app): void
+    {
+        $app['config']->set('database.default', 'testing');
+    }
+
     protected function getPackageProviders($app)
     {
         $providers = [
@@ -57,11 +64,6 @@ class TestCase extends Orchestra
         sort($providers);
 
         return $providers;
-    }
-
-    public function getEnvironmentSetUp($app): void
-    {
-        $app['config']->set('database.default', 'testing');
     }
 
     protected function defineDatabaseMigrations(): void
