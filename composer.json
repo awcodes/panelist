@@ -1,0 +1,103 @@
+{
+    "name": "awcodes/panelist",
+    "description": "A reusable Filament plugin that transforms standard resource CRUD interfaces into a modern editing experience similar to Gmail, Notion, or Linear",
+    "keywords": [
+        "awcodes",
+        "laravel",
+        "filamentphp",
+        "filament",
+        "filament-plugin",
+        "panelist"
+    ],
+    "homepage": "https://github.com/awcodes/panelist",
+    "support": {
+        "issues": "https://github.com/awcodes/panelist/issues",
+        "source": "https://github.com/awcodes/panelist"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adam Weston",
+            "email": "adam@aw.codes",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^4.0|^5.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.7|^4.0",
+        "pestphp/pest-plugin-arch": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+        "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+        "rector/rector": "^2.0",
+        "spatie/laravel-ray": "^1.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "Awcodes\\Panelist\\": "src/",
+            "Awcodes\\Panelist\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Awcodes\\Panelist\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare",
+            "@php ./vendor/bin/testbench package:discover --ansi"
+        ],
+        "lint": "pint",
+        "refactor": "rector",
+        "test:lint": "pint --test",
+        "test:refactor": "rector --dry-run",
+        "test:types": "phpstan analyse",
+        "test:unit": "pest",
+        "test": [
+            "@test:refactor",
+            "@test:lint",
+            "@test:types",
+            "@test:unit"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Awcodes\\Panelist\\PanelistServiceProvider"
+            ],
+            "aliases": {
+                "Panelist": "Awcodes\\Panelist\\Facades\\Panelist"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
