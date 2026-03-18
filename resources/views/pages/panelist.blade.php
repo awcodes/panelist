@@ -33,7 +33,7 @@
     >
         {{-- Sidebar Panel --}}
         <div
-            class="panelist-sidebar flex-shrink-0 overflow-auto border-e border-gray-200 dark:border-gray-700"
+            class="panelist-sidebar flex-shrink-0 overflow-auto"
             :style="`width: ${sidebarWidth}px; min-width: ${sidebarWidth}px;`"
         >
             @livewire('panelist.sidebar-table', ['resource' => $resource], key('panelist-sidebar-' . $resource))
@@ -41,7 +41,7 @@
 
         {{-- Resize Handle --}}
         <div
-            class="panelist-resize-handle flex w-1 flex-shrink-0 cursor-col-resize items-center justify-center bg-gray-200 hover:bg-primary-500 active:bg-primary-600 dark:bg-gray-700 dark:hover:bg-primary-500"
+            class="panelist-resize-handle flex w-1 flex-shrink-0 cursor-col-resize items-center justify-center bg-gray-950/10 hover:bg-primary-500 active:bg-primary-600 dark:bg-white/10 dark:hover:bg-primary-500"
             @mousedown.prevent="startDrag"
             :class="{ 'bg-primary-500': isDragging }"
         >

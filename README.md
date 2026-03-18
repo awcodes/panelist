@@ -23,6 +23,8 @@ composer require awcodes/panelist
 After setting up a custom theme, add the plugin's views to your theme CSS file (or your app's CSS file for standalone packages):
 
 ```css
+@import '../../../../vendor/awcodes/panelist/resources/css/index.css';
+
 @source '../../../../vendor/awcodes/panelist/resources/**/*.blade.php';
 ```
 

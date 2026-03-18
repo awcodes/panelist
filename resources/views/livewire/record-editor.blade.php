@@ -19,7 +19,7 @@
     >
         @if ($this->isActive)
             {{-- Header --}}
-            <div class="flex flex-shrink-0 items-center justify-between border-b border-gray-950/20 px-4 py-3 dark:border-white/10">
+            <div class="flex flex-shrink-0 items-center justify-between border-b border-gray-950/20 pl-4 py-3 dark:border-white/10">
                 <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                     @if ($isEditing)
                         {{ __('filament-panels::resources/pages/edit-record.breadcrumb') }}
@@ -48,7 +48,6 @@
                     <x-filament::button
                         wire:click="save"
                         size="sm"
-                        icon="heroicon-m-check"
                     >
                         @if ($isEditing)
                             {{ __('filament-panels::resources/pages/edit-record.form.actions.save.label') }}
@@ -77,7 +76,6 @@
                     wire:click="$dispatch('panelist-create-record')"
                     size="sm"
                     color="gray"
-                    icon="heroicon-m-plus"
                 >
                     {{ __('filament-panels::resources/pages/create-record.breadcrumb') }}
                 </x-filament::button>

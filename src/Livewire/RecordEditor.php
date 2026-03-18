@@ -152,7 +152,6 @@ class RecordEditor extends Component implements HasActions, HasForms
         return Action::make('delete')
             ->label(__('filament-actions::delete.single.label'))
             ->color('danger')
-            ->icon('heroicon-m-trash')
             ->size(Size::Small)
             ->requiresConfirmation()
             ->modalHeading(__('filament-actions::delete.single.modal.heading', ['label' => $this->getModelLabel()]))

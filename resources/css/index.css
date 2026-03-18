@@ -1,7 +1,7 @@
 .panelist-layout {
     .fi-ta-ctn,
     .fi-ta-content {
-        @apply bg-transparent rounded-none;
+        @apply bg-transparent rounded-none pr-4;
 
         .fi-ta-record {
             @apply bg-transparent;
@@ -13,15 +13,31 @@
     }
 
     .panelist-selected-record {
-        @apply !bg-primary-500/10;
+        @apply !bg-primary-500/20;
     }
 
     .fi-ta-header-toolbar {
-        @apply flex-row-reverse;
+        @apply flex-row-reverse px-0.5;
     }
 
     .fi-ta-ctn .fi-ta-header-toolbar > :nth-child(2) {
         margin-inline-start: 0;
+    }
+
+    .fi-ta-header-cell {
+        @apply py-2;
+
+        &:first-of-type {
+            @apply pl-3;
+        }
+    }
+
+    .fi-ta-cell:first-of-type {
+        @apply pl-0;
+    }
+
+    .fi-pagination {
+        @apply px-0.5;
     }
 }
 
