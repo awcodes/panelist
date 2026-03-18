@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Awcodes\Panelist;
 
 use Awcodes\Panelist\Commands\PanelistCommand;
+use Awcodes\Panelist\Livewire\RecordEditor;
+use Awcodes\Panelist\Livewire\SidebarTable;
 use Awcodes\Panelist\Testing\TestsPanelist;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
@@ -14,6 +16,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
+use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -64,6 +67,10 @@ class PanelistServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Livewire Component Registration
+        Livewire::component('panelist.sidebar-table', SidebarTable::class);
+        Livewire::component('panelist.record-editor', RecordEditor::class);
+
         // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),

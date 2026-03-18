@@ -1,1 +1,28 @@
-@import '../../vendor/filament/filament/resources/css/theme.css';
+.panelist-layout {
+    .fi-ta-ctn,
+    .fi-ta-content {
+        @apply bg-transparent rounded-none;
+
+        .fi-ta-record {
+            @apply bg-transparent;
+        }
+    }
+
+    .fi-ta-content {
+        @apply divide-y divide-gray-950/20 dark:divide-white/10;
+    }
+
+    .panelist-selected-record {
+        @apply !bg-primary-500/10;
+    }
+
+    .fi-ta-header-toolbar {
+        @apply flex-row-reverse;
+    }
+
+    .fi-ta-ctn .fi-ta-header-toolbar > :nth-child(2) {
+        margin-inline-start: 0;
+    }
+}
+
+
