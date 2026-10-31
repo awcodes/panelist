@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 1.x
+    paths:
+      - "src/**"
+      - "resources/**"
+      - "tests/**"
+      # workbench/ is a tracked Testbench app that rector and phpstan analyse
+      # (.github#6), so a workbench-only commit must trigger CI. Without this it
+      # lands on the active branch unchecked and then fails the NEXT unrelated PR.
+      - "workbench/**"
+      - "composer.json"
+      - "composer.lock"
+      - "phpunit.xml*"
+      - "phpstan.neon*"
+      - "phpstan-baseline.neon"
+      - "rector.php"
+      - "pint.json"
+      # bin/ holds the asset build script, so a change here changes the built
+      # bundle without touching resources/.
+      - "bin/**"
+      - ".github/workflows/**"
+  pull_request:
+    branches:
+      - 1.x
+    paths:
+      - "src/**"
+      - "resources/**"
+      - "tests/**"
+      # workbench/ is a tracked Testbench app that rector and phpstan analyse
+      # (.github#6), so a workbench-only commit must trigger CI. Without this it
+      # lands on the active branch unchecked and then fails the NEXT unrelated PR.
+      - "workbench/**"
+      - "composer.json"
+      - "composer.lock"
+      - "phpunit.xml*"
+      - "phpstan.neon*"
+      - "phpstan-baseline.neon"
+      - "rector.php"
+      - "pint.json"
+      # bin/ holds the asset build script, so a change here changes the built
+      # bundle without touching resources/.
+      - "bin/**"
+      - ".github/workflows/**"
+
+jobs:
+  ci:
+    uses: awcodes/.github/.github/workflows/filament-plugin.yml@ad63f1536b965fed92274516cb81f172b1d60e1a # v1.4.3
+    with:
+      # Single-branch package supporting Filament 4 and 5, so both majors run here.
+      matrix: |
+        [
+          {"php":"8.5","laravel":"13.*","filament":"5.*","testbench":"11.*","dependencies":"prefer-stable"},
+          {"php":"8.4","laravel":"13.*","filament":"5.*","testbench":"11.*","dependencies":"prefer-stable"},
+          {"php":"8.5","laravel":"12.*","filament":"5.*","testbench":"10.*","dependencies":"prefer-stable"},
+          {"php":"8.4","laravel":"12.*","filament":"5.*","testbench":"10.*","dependencies":"prefer-stable"},
+          {"php":"8.3","laravel":"12.*","filament":"5.*","testbench":"10.*","dependencies":"prefer-stable"},
+          {"php":"8.4","laravel":"12.*","filament":"4.*","testbench":"10.*","dependencies":"prefer-stable"},
+          {"php":"8.3","laravel":"12.*","filament":"4.*","testbench":"10.*","dependencies":"prefer-stable"}
+        ]
+      run-tests: true
+      run-lint: true
+      run-static-analysis: true
+      run-reformat: true
+      run-build: false

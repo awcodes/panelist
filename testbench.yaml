@@ -1,6 +1,7 @@
 laravel: '@testbench'
 
 providers:
+  - Awcodes\Panelist\PanelistServiceProvider
   - Workbench\App\Providers\Filament\AdminPanelProvider
   - Workbench\App\Providers\WorkbenchServiceProvider
 
@@ -10,8 +11,11 @@ migrations:
 seeders:
   - Workbench\Database\Seeders\DatabaseSeeder
 
+env:
+  - AUTH_MODEL='Workbench\App\Models\User'
+
 workbench:
-  start: '/'
+  start: '/admin'
   install: true
   health: false
   discovers:

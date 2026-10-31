@@ -1,15 +1,21 @@
 includes:
     - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
     - phpstan-baseline.neon
 
 parameters:
-    level: 4
+    level: 5
+    reportUnmatchedIgnoredErrors: false
     paths:
         - src
         - config
-        - workbench/app
+        - workbench
+    excludePaths:
+        analyse:
+            - workbench/storage (?)
     tmpDir: build/phpstan
-    checkOctaneCompatibility: true
-    checkModelProperties: true
-
+    ignoreErrors:
+        # larastan narrows a string literal to view-string only when it can resolve
+        # the view namespace. It does not resolve this package's own `panelist::`
+        # namespace outside a booted app (same exception as curator).
+        - identifier: argument.type
+          message: '#expects view\-string#'

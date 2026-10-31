@@ -34,15 +34,17 @@ describe('registration', function (): void {
     });
 
     it('registers a custom editor so Livewire can resolve it on later requests', function (): void {
-        // Livewire 3 (Filament 4) cannot resolve an unregistered class on update requests,
-        // so the editor must be explicitly registered rather than resolved from its name.
-        $registered = fn (): array => (fn (): array => $this->classComponents)->call(app('livewire.finder'));
-
-        expect($registered())->not->toContain(CustomPostEditor::class);
+        // Livewire 3 (Filament 4) cannot resolve an unregistered class on update requests, so the editor must be
+        // registered by class. The registry differs between Livewire 3 and 4, so the call itself is asserted.
+        Livewire::partialMock()->shouldReceive('component')->once()->with(CustomPostEditor::class);
 
         app(Panelist::class)->registerEditorComponent(ManagePostsWithCustomEditor::class);
+    });
 
-        expect($registered())->toContain(CustomPostEditor::class);
+    it('does not re-register the default editor', function (): void {
+        Livewire::partialMock()->shouldNotReceive('component');
+
+        app(Panelist::class)->registerEditorComponent(ManagePosts::class);
     });
 
     it('rejects an editor that does not extend RecordEditor', function (): void {

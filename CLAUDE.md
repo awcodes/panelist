@@ -21,17 +21,16 @@ composer lint           # Fix code style with Pint
 composer refactor       # Apply Rector fixes
 ```
 
-### JavaScript
+### Frontend
 
 ```bash
-npm run dev    # Watch mode (esbuild)
-npm run build  # Production build
+npm run build  # Compile the workbench theme (workbench/resources/css/filament/admin/theme.css) with Tailwind
 ```
 
 ### Workbench (local dev app)
 
 ```bash
-composer build   # Build workbench assets
+composer build   # Build the workbench app (Filament assets, fresh seeded DB) and compile its theme
 composer serve   # Build + serve workbench at localhost
 composer clear   # Clean testbench skeleton
 composer prepare # Prepare testbench
@@ -66,9 +65,9 @@ Panels communicate via Livewire events (`panelist-record-selected`, `panelist-re
 
 ### Frontend Assets
 
-- `resources/css/index.css` — Imports Filament theme; compiled output goes to `resources/dist/`
-- `resources/js/index.js` — JavaScript entry point
-- `bin/build.js` — esbuild configuration (supports watch mode)
+- `resources/css/index.css` — Tailwind source the consuming app imports into its Filament theme (see README); the package ships no compiled CSS or JS
+- Keyboard shortcuts and the resizable layout are inline Alpine in `resources/views/pages/panelist.blade.php`
+- The workbench theme (`workbench/resources/css/filament/admin/theme.css`) imports `index.css` the same way a consumer does and is served by the `workbench.theme` route
 
 ### Testing Setup
 
@@ -79,6 +78,7 @@ Panels communicate via Livewire events (`panelist-record-selected`, `panelist-re
 
 ### Code Quality
 
-- PHPStan at level 4 with Larastan + Octane compatibility checks
+- PHPStan at level 5 with Larastan over `src`, `config` and `workbench`
 - Pint with Laravel preset (custom rules in `pint.json`)
-- Rector targeting PHP 8.2+ patterns
+- Rector over `src` and `workbench`
+- CI runs the shared `awcodes/.github` Filament plugin workflow (Filament 4 and 5); `composer.lock` is not committed
