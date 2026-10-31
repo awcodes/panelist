@@ -94,6 +94,7 @@ class SidebarTable extends Component implements HasActions, HasForms, HasTable
     }
 
     #[On('panelist-record-cancelled')]
+    #[On('panelist-create-record')]
     public function clearSelection(): void
     {
         $this->selectedRecordId = null;

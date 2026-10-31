@@ -51,6 +51,7 @@ abstract class PanelistPage extends Page
 
     #[On('panelist-record-cancelled')]
     #[On('panelist-record-deleted')]
+    #[On('panelist-create-record')]
     public function clearActiveRecord(): void
     {
         $this->activeRecordId = '';

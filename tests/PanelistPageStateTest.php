@@ -62,7 +62,7 @@ describe('url state', function (): void {
             ->test(ManagePosts::class)
             ->dispatch($event, id: 3)
             ->assertSet('activeRecordId', '');
-    })->with(['panelist-record-cancelled', 'panelist-record-deleted']);
+    })->with(['panelist-record-cancelled', 'panelist-record-deleted', 'panelist-create-record']);
 });
 
 describe('page access', function (): void {
@@ -84,4 +84,27 @@ describe('page access', function (): void {
 
         Livewire::test(ManagePosts::class)->assertActionHidden('create');
     });
+});
+
+describe('keyboard shortcuts', function (): void {
+    it('listens for shortcuts by default', function (): void {
+        $this->get(PostResource::getUrl('index'))
+            ->assertOk()
+            ->assertSee('x-on:keydown.window="onKeydown($event)"', escape: false);
+    });
+
+    it('does not listen for shortcuts when they are disabled', function (): void {
+        config()->set('panelist.enable_keyboard_shortcuts', false);
+
+        $this->get(PostResource::getUrl('index'))
+            ->assertOk()
+            ->assertDontSee('x-on:keydown.window', escape: false);
+    });
+
+    it('tells the shortcuts whether creating is allowed', function (bool $allowed): void {
+        PostPolicy::$denied = $allowed ? [] : ['create'];
+
+        $this->get(PostResource::getUrl('index'))
+            ->assertSee('canCreate: ' . ($allowed ? 'true' : 'false'), escape: false);
+    })->with(['allowed' => true, 'forbidden' => false]);
 });

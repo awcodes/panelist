@@ -114,3 +114,23 @@ it('clears the selection when editing is cancelled', function (): void {
         ->assertSet('selectedRecordId', null)
         ->assertDontSeeHtml('panelist-selected-record');
 });
+
+it('highlights a record opened by key from the keyboard', function (): void {
+    $post = PostFactory::new()->create();
+
+    // Keyboard navigation reads keys from the DOM, so they arrive as strings.
+    sidebar()
+        ->call('selectRecord', (string) $post->getKey())
+        ->assertDispatched('panelist-record-selected', id: (string) $post->getKey())
+        ->assertSeeHtml('panelist-selected-record');
+});
+
+it('clears the selection when a new record is being created', function (): void {
+    $post = PostFactory::new()->create();
+
+    sidebar()
+        ->callTableAction('openRecord', $post)
+        ->dispatch('panelist-create-record')
+        ->assertSet('selectedRecordId', null)
+        ->assertDontSeeHtml('panelist-selected-record');
+});

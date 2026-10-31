@@ -16,6 +16,10 @@
         @apply !bg-primary-500/20;
     }
 
+    .panelist-focused-record {
+        @apply outline-2 -outline-offset-2 outline-primary-500;
+    }
+
     .fi-ta-header-toolbar {
         @apply flex-row-reverse px-0.5;
     }

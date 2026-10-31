@@ -1,6 +1,5 @@
 <div class="panelist-record-editor h-full">
     @php
-        $keyboardShortcuts = \Awcodes\Panelist\PanelistPlugin::get()->hasKeyboardShortcuts();
         $isEditing = $this->recordId !== null;
         $isCreating = $this->isActive && $this->recordId === null;
     @endphp
@@ -10,11 +9,6 @@
         x-data="{}"
         @panelist-record-selected.window="$wire.loadRecord($event.detail.id)"
         @panelist-create-record.window="$wire.createRecord()"
-        @if ($keyboardShortcuts)
-        @keydown.meta.s.window.prevent="$wire.save()"
-        @keydown.ctrl.s.window.prevent="$wire.save()"
-        @keydown.escape.window="$wire.cancel()"
-        @endif
         @panelist-record-saved.window="$wire.$refresh()"
     >
         @if ($this->isActive)

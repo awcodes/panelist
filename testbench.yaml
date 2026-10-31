@@ -23,6 +23,7 @@ workbench:
     views: false
   build:
     - asset-publish
+    - filament-assets
     - create-sqlite-db
     - db-wipe
     - migrate-fresh
