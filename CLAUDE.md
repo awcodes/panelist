@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `awcodes/panelist` is a Filament 4/5 plugin that transforms standard resource CRUD interfaces into a Gmail/Notion/Linear-style master-detail (panelist) editing experience — a sidebar list on the left, a form editor on the right.
 
+## Versioning
+
+Released packages follow semver: `1.x` is the active branch and the docs version on docs.aw.codes. Public API changes (the `PanelistPage` and `RecordEditor` extension points, config keys, the `make:panelist-page` command, event names) need a major release.
+
 ## Commands
 
 ### PHP
