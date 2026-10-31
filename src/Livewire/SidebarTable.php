@@ -41,7 +41,6 @@ class SidebarTable extends Component implements HasActions, HasForms, HasTable
         $table = $resource::table(
             $table
                 ->query(fn (): Builder => $resource::getEloquentQuery())
-//                ->recordUrl(null)
                 ->selectable(false)
                 ->recordClasses(fn (Model $record): string => $this->isSelected($record) ? 'panelist-selected-record' : '')
         );
