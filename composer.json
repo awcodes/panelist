@@ -41,8 +41,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Awcodes\\Panelist\\": "src/",
-            "Awcodes\\Panelist\\Database\\Factories\\": "database/factories/"
+            "Awcodes\\Panelist\\": "src/"
         }
     },
     "autoload-dev": {

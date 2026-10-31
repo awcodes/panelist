@@ -53,8 +53,8 @@ This is a standard Laravel package using Orchestra Testbench for development/tes
 ### Core Classes
 
 - **`PanelistPlugin`** — Implements Filament's `Plugin` interface. Registered in a Filament panel via `->plugin(PanelistPlugin::make())`. Handles asset/view/translation registration and holds plugin-level configuration.
-- **`PanelistServiceProvider`** — Registers views, config, migrations, and discovers commands. The entry point for Laravel's package auto-discovery.
-- **`Facades/Panelist`** — Facade for the core `Panelist` class.
+- **`PanelistServiceProvider`** — Registers views, config, translations, the `make:panelist-page` command and the Livewire components, and publishes the page stub. The entry point for Laravel's package auto-discovery.
+- **`Panelist`** (and its facade) — Registers each Panelist page's editor component with Livewire after boot.
 
 ### Integration Pattern
 
@@ -73,7 +73,8 @@ Panels communicate via Livewire events (`panelist-record-selected`, `panelist-re
 ### Testing Setup
 
 - Tests use Orchestra Testbench + Pest + Livewire testing support
-- `tests/TestCase.php` extends `FilamentTestCase` with Livewire/Filament traits
+- `tests/TestCase.php` extends Orchestra Testbench's `TestCase` with `WithWorkbench`, so tests run against the workbench panel, models and factories
+- `tests/Fixtures/` holds a toggleable `PostPolicy`, a scoped `PublishedPostResource` and a custom editor used to test authorization, scoping and editor hooks
 - `tests/DebugTest.php` enforces no `dd()`/`dump()` left in source code
 
 ### Code Quality
