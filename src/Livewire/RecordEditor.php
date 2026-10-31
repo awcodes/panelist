@@ -96,10 +96,11 @@ class RecordEditor extends Component implements HasActions, HasForms
         $this->isActive = true;
 
         // The form schema is cached for the request, so it must be pointed at the new record before filling.
-        $this->form
-            ->model($record)
-            ->operation('edit')
-            ->fill($record->attributesToArray());
+        $this->form->model($record)->operation('edit');
+
+        $this->callHook('beforeFill');
+        $this->form->fill($this->mutateFormDataBeforeFill($record->attributesToArray()));
+        $this->callHook('afterFill');
     }
 
     public function createRecord(): void
@@ -137,13 +138,32 @@ class RecordEditor extends Component implements HasActions, HasForms
         try {
             $this->beginDatabaseTransaction();
 
+            $this->callHook('beforeValidate');
+
             if ($existingRecord instanceof Model) {
                 // With an existing record as the form model, getState() also saves relationships.
-                $record = $this->handleRecordUpdate($existingRecord, $this->form->getState());
+                $data = $this->form->getState(afterValidate: function (): void {
+                    $this->callHook('afterValidate');
+                    $this->callHook('beforeSave');
+                });
+
+                $record = $this->handleRecordUpdate($existingRecord, $this->mutateFormDataBeforeSave($data));
+
+                $this->callHook('afterSave');
             } else {
-                $record = $this->handleRecordCreation($this->form->getState());
+                $data = $this->form->getState();
+
+                $this->callHook('afterValidate');
+
+                $data = $this->mutateFormDataBeforeCreate($data);
+
+                $this->callHook('beforeCreate');
+
+                $record = $this->handleRecordCreation($data);
 
                 $this->form->model($record)->saveRelationships();
+
+                $this->callHook('afterCreate');
             }
         } catch (Halt $exception) {
             $exception->shouldRollbackDatabaseTransaction()
@@ -191,7 +211,9 @@ class RecordEditor extends Component implements HasActions, HasForms
 
                 $id = $this->recordId;
 
+                $this->callHook('beforeDelete');
                 $this->getRecord()?->delete();
+                $this->callHook('afterDelete');
 
                 $this->resetEditor();
 
@@ -217,6 +239,33 @@ class RecordEditor extends Component implements HasActions, HasForms
     public function render(): View
     {
         return view('panelist::livewire.record-editor');
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return $data;
     }
 
     /**
@@ -267,6 +316,16 @@ class RecordEditor extends Component implements HasActions, HasForms
         $record = $this->getRecord();
 
         return $record instanceof Model && $this->resource::canDelete($record);
+    }
+
+    /**
+     * Call a lifecycle hook such as beforeSave() or afterCreate() when the editor defines it.
+     */
+    protected function callHook(string $hook): void
+    {
+        if (method_exists($this, $hook)) {
+            $this->{$hook}();
+        }
     }
 
     protected function resetEditor(): void

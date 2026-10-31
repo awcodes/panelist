@@ -60,7 +60,7 @@ This is a standard Laravel package using Orchestra Testbench for development/tes
 
 Each resource gets its own page class extending the abstract `Pages\PanelistPage` (Filament reads the resource from the page's static `$resource`), registered as the resource's `index` page. `make:panelist-page` generates it from `stubs/panelist-page.stub`. Never generate page classes at runtime (e.g. `eval()`): Filament's component and route caches skip `getPages()`, so cached classes must be autoloadable from disk — `tests/PanelistPageTest.php` enforces this. The layout is:
 - **Left panel** — Livewire `SidebarTable` component (list, search, filters, create action)
-- **Right panel** — Livewire `RecordEditor` component (form, save actions)
+- **Right panel** — Livewire `RecordEditor` component (form, save actions). A page can swap in a subclass via `protected static string $editor`; `Panelist::registerEditorComponents()` registers these with Livewire after boot, which Livewire 3 (Filament 4) needs to resolve them on update requests. Customization hooks (`mutateFormData*`, `handleRecord*`, `before*`/`after*`) mirror Filament's create/edit pages and live on the editor, not the page.
 
 Panels communicate via Livewire events (`panelist-record-selected`, `panelist-record-saved`).
 

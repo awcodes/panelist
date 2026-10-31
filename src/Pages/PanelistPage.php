@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Awcodes\Panelist\Pages;
 
+use Awcodes\Panelist\Livewire\RecordEditor;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\Page;
 use Livewire\Attributes\On;
@@ -17,7 +18,22 @@ abstract class PanelistPage extends Page
     #[Url(as: 'record', except: '')]
     public string $activeRecordId = '';
 
+    /**
+     * The Livewire component that edits records. Extend RecordEditor to customize it.
+     *
+     * @var class-string<RecordEditor>
+     */
+    protected static string $editor = RecordEditor::class;
+
     protected string $view = 'panelist::pages.panelist';
+
+    /**
+     * @return class-string<RecordEditor>
+     */
+    public static function getEditor(): string
+    {
+        return static::$editor;
+    }
 
     #[On('panelist-record-selected')]
     public function syncActiveRecord(int | string $id): void

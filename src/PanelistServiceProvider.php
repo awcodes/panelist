@@ -71,6 +71,9 @@ class PanelistServiceProvider extends PackageServiceProvider
         Livewire::component('panelist.sidebar-table', SidebarTable::class);
         Livewire::component('panelist.record-editor', RecordEditor::class);
 
+        // Panels and their resources are only fully registered once the application has booted.
+        $this->app->booted(fn () => $this->app->make(Panelist::class)->registerEditorComponents());
+
         // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),

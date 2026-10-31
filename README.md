@@ -123,6 +123,50 @@ PanelistPlugin::make()
     ->keyboardShortcuts(false)
 ```
 
+## Customizing the Editor
+
+The right-hand panel is a Livewire component, `Awcodes\Panelist\Livewire\RecordEditor`. To customize how records are filled and saved, extend it and point your page at the subclass:
+
+```php
+use Awcodes\Panelist\Livewire\RecordEditor;
+
+class PostEditor extends RecordEditor
+{
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['user_id'] = auth()->id();
+
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        // ...
+    }
+}
+```
+
+```php
+class ManagePosts extends PanelistPage
+{
+    protected static string $resource = PostResource::class;
+
+    protected static string $editor = PostEditor::class;
+}
+```
+
+Panelist registers the editor with Livewire automatically. The editor supports the same hooks as Filament's create and edit pages:
+
+| Purpose | Methods |
+|---|---|
+| Mutate form data | `mutateFormDataBeforeFill()`, `mutateFormDataBeforeSave()`, `mutateFormDataBeforeCreate()` |
+| Replace persistence | `handleRecordCreation()`, `handleRecordUpdate()` |
+| Lifecycle hooks | `beforeFill()`, `afterFill()`, `beforeValidate()`, `afterValidate()`, `beforeSave()`, `afterSave()`, `beforeCreate()`, `afterCreate()`, `beforeDelete()`, `afterDelete()` |
+
+Throw `Filament\Support\Exceptions\Halt` from a hook to stop the save.
+
+The editor checks the resource's `canCreate()`, `canEdit()` and `canDelete()` authorization, and only loads records returned by the resource's `getEloquentQuery()`, so tenancy and other query scoping apply.
+
 ## Keyboard Shortcuts
 
 When keyboard shortcuts are enabled (the default), the following bindings are available:
