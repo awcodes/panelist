@@ -59,41 +59,44 @@ public function panel(Panel $panel): Panel
 }
 ```
 
-### 2. Add the Trait to a Resource
+### 2. Create a Panelist Page
 
-Add `HasPanelist` to any Filament resource to replace its standard list page with the two-panel layout:
+Generate a Panelist page for a resource:
+
+```bash
+php artisan make:panelist-page PostResource
+```
+
+The command accepts the resource's class name or its fully qualified class name, and prompts you to pick one when you omit it. It writes the page into the resource's `Pages` directory, named `Manage{PluralModel}` by default (use `--name` to change it):
 
 ```php
-use Awcodes\Panelist\Concerns\HasPanelist;
-use Filament\Resources\Resource;
+namespace App\Filament\Resources\Posts\Pages;
 
-class PostResource extends Resource
+use App\Filament\Resources\Posts\PostResource;
+use Awcodes\Panelist\Pages\PanelistPage;
+
+class ManagePosts extends PanelistPage
 {
-    use HasPanelist;
-
-    protected static ?string $model = Post::class;
-
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->components([
-            TextInput::make('title')->required(),
-            Textarea::make('content')->rows(8),
-            Toggle::make('is_published')->label('Published'),
-        ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table->columns([
-            TextColumn::make('title')->searchable()->sortable(),
-            IconColumn::make('is_published')->boolean(),
-            TextColumn::make('created_at')->dateTime(),
-        ]);
-    }
+    protected static string $resource = PostResource::class;
 }
 ```
 
-That's it. Navigating to the resource will now render the panelist layout instead of the standard Filament list view. Your existing `form()` and `table()` definitions work unchanged.
+### 3. Register It as the Index Page
+
+Point the resource's `index` page at the new class:
+
+```php
+public static function getPages(): array
+{
+    return [
+        'index' => Pages\ManagePosts::route('/'),
+        'create' => Pages\CreatePost::route('/create'),
+        'edit' => Pages\EditPost::route('/{record}/edit'),
+    ];
+}
+```
+
+Navigating to the resource now renders the panelist layout instead of the standard list page. Your existing `form()` and `table()` definitions work unchanged. Keeping the `create` and `edit` pages registered is optional, but it lets global search, notifications and other links that call `PostResource::getUrl('edit')` keep working.
 
 ### How It Works
 

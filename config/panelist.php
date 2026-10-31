@@ -7,16 +7,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Auto Register Resources
-    |--------------------------------------------------------------------------
-    | When enabled, all resources that use the HasPanelist trait will
-    | automatically have their index page replaced with the panelist layout.
-    | This is opt-in and disabled by default for safety.
-    */
-    'auto_register_resources' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Sidebar Width
     |--------------------------------------------------------------------------
     | The default width (in pixels) of the sidebar panel.

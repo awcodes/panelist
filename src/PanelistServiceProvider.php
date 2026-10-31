@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Awcodes\Panelist;
 
-use Awcodes\Panelist\Commands\PanelistCommand;
+use Awcodes\Panelist\Commands\MakePanelistPageCommand;
 use Awcodes\Panelist\Livewire\RecordEditor;
 use Awcodes\Panelist\Livewire\SidebarTable;
 use Awcodes\Panelist\Testing\TestsPanelist;
@@ -121,7 +121,7 @@ class PanelistServiceProvider extends PackageServiceProvider
     protected function getCommands(): array
     {
         return [
-            PanelistCommand::class,
+            MakePanelistPageCommand::class,
         ];
     }
 

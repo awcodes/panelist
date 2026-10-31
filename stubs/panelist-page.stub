@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+{{ imports }}
+
+class {{ class }} extends PanelistPage
+{
+    protected static string $resource = {{ resourceClass }}::class;
+}

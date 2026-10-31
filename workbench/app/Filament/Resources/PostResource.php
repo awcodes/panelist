@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Workbench\App\Filament\Resources;
 
-use Awcodes\Panelist\Concerns\HasPanelist;
 use BackedEnum;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -14,12 +13,11 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Workbench\App\Filament\Resources\PostResource\Pages\ManagePosts;
 use Workbench\App\Models\Post;
 
 class PostResource extends Resource
 {
-    use HasPanelist;
-
     protected static ?string $model = Post::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
@@ -60,5 +58,12 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ManagePosts::route('/'),
+        ];
     }
 }

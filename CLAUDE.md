@@ -56,9 +56,9 @@ This is a standard Laravel package using Orchestra Testbench for development/tes
 - **`PanelistServiceProvider`** — Registers views, config, migrations, and discovers commands. The entry point for Laravel's package auto-discovery.
 - **`Facades/Panelist`** — Facade for the core `Panelist` class.
 
-### Planned Integration Pattern
+### Integration Pattern
 
-Resources opt-in via a `HasPanelist` trait. The plugin intercepts the resource's index page, replacing it with a two-panel layout:
+Each resource gets its own page class extending the abstract `Pages\PanelistPage` (Filament reads the resource from the page's static `$resource`), registered as the resource's `index` page. `make:panelist-page` generates it from `stubs/panelist-page.stub`. Never generate page classes at runtime (e.g. `eval()`): Filament's component and route caches skip `getPages()`, so cached classes must be autoloadable from disk — `tests/PanelistPageTest.php` enforces this. The layout is:
 - **Left panel** — Livewire `SidebarTable` component (list, search, filters, create action)
 - **Right panel** — Livewire `RecordEditor` component (form, save actions)
 
