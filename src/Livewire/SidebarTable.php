@@ -43,7 +43,7 @@ class SidebarTable extends Component implements HasActions, HasForms, HasTable
                 ->query(fn (): Builder => $resource::getEloquentQuery())
 //                ->recordUrl(null)
                 ->selectable(false)
-                ->recordClasses(fn (Model $record): string => $record->getKey() === $this->selectedRecordId ? 'panelist-selected-record' : '')
+                ->recordClasses(fn (Model $record): string => $this->isSelected($record) ? 'panelist-selected-record' : '')
         );
 
         return $table
@@ -53,6 +53,13 @@ class SidebarTable extends Component implements HasActions, HasForms, HasTable
                     ->label(__('panelist::panelist.open_record'))
                     ->action(fn (Model $record) => $this->selectRecord($record->getKey())),
             ]);
+    }
+
+    public function isSelected(Model $record): bool
+    {
+        // Keys from the query string are strings while model keys are usually integers.
+        return $this->selectedRecordId !== null
+            && (string) $record->getKey() === (string) $this->selectedRecordId;
     }
 
     public function selectRecord(int | string $id): void

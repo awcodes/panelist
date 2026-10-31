@@ -36,7 +36,11 @@
             class="panelist-sidebar flex-shrink-0 overflow-auto"
             :style="`width: ${sidebarWidth}px; min-width: ${sidebarWidth}px;`"
         >
-            @livewire('panelist.sidebar-table', ['resource' => $resource], key('panelist-sidebar-' . $resource))
+            @livewire(
+                'panelist.sidebar-table',
+                ['resource' => $resource, 'selectedRecordId' => $this->activeRecordId ?: null],
+                key('panelist-sidebar-' . $resource)
+            )
         </div>
 
         {{-- Resize Handle --}}
