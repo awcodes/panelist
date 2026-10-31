@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Workbench\App\Filament\Resources;
 
 use BackedEnum;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -32,6 +33,12 @@ class PostResource extends Resource
 
             Textarea::make('content')
                 ->rows(8)
+                ->columnSpanFull(),
+
+            Select::make('tags')
+                ->relationship('tags', 'name')
+                ->multiple()
+                ->preload()
                 ->columnSpanFull(),
 
             Toggle::make('is_published')

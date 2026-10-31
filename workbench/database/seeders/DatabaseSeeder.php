@@ -7,6 +7,7 @@ namespace Workbench\Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Workbench\Database\Factories\PostFactory;
+use Workbench\Database\Factories\TagFactory;
 use Workbench\Database\Factories\UserFactory;
 
 class DatabaseSeeder extends Seeder
@@ -23,6 +24,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        PostFactory::new()->times(20)->create();
+        $tags = TagFactory::new()->times(8)->create();
+
+        PostFactory::new()->times(20)->create()->each(
+            fn ($post) => $post->tags()->attach($tags->random(random_int(0, 3))),
+        );
     }
 }

@@ -11,34 +11,40 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Pages\Concerns\CanUseDatabaseTransactions;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Size;
+use Filament\Support\Exceptions\Halt;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
+use Throwable;
 
 /**
  * @property-read Schema $form
  */
 class RecordEditor extends Component implements HasActions, HasForms
 {
+    use CanUseDatabaseTransactions;
     use InteractsWithActions;
     use InteractsWithForms;
 
     /**
      * Fully-qualified resource class name passed from the panelist page.
      *
-     * @var class-string
+     * @var class-string<resource>
      */
     public string $resource;
 
     /**
-     * The ID of the currently loaded record, or null in create mode.
+     * The key of the currently loaded record, or null in create mode.
      */
     public int | string | null $recordId = null;
 
     /**
-     * Whether the editor is in an active state (editing or creating).
-     * Distinguishes from the initial empty state where nothing is selected.
+     * Whether the editor is editing or creating, as opposed to the initial empty state.
      */
     public bool $isActive = false;
 
@@ -53,98 +59,121 @@ class RecordEditor extends Component implements HasActions, HasForms
     {
         $this->form->fill();
 
-        if ($initialRecordId) {
+        if (filled($initialRecordId)) {
             $this->loadRecord($initialRecordId);
         }
     }
 
     public function form(Schema $schema): Schema
     {
-        /** @var class-string $resource */
-        $resource = $this->resource;
-
-        return $resource::form(
+        return $this->resource::form(
             $schema
                 ->statePath('data')
-                ->model($this->getRecord() ?? $resource::getModel())
-                ->operation($this->recordId ? 'edit' : 'create')
+                ->model($this->getRecord() ?? $this->resource::getModel())
+                ->operation($this->recordId === null ? 'create' : 'edit')
         );
     }
 
     public function loadRecord(int | string $id): void
     {
-        $this->recordId = $id;
-        $this->isActive = true;
-        $this->record = null;
+        $record = $this->resolveRecord($id);
 
-        /** @var class-string $resource */
-        $resource = $this->resource;
+        // Out-of-scope and forbidden records get the same response, so the editor never reveals which records exist.
+        if (! $record instanceof Model || ! $this->resource::canEdit($record)) {
+            $this->resetEditor();
+            $this->dispatch('panelist-record-cancelled');
 
-        $record = $resource::getModel()::find($id);
+            Notification::make()
+                ->title(__('panelist::panelist.record_unavailable'))
+                ->danger()
+                ->send();
 
-        if (! $record) {
             return;
         }
 
+        $this->recordId = $id;
         $this->record = $record;
-        $this->form->fill($record->attributesToArray());
+        $this->isActive = true;
+
+        // The form schema is cached for the request, so it must be pointed at the new record before filling.
+        $this->form
+            ->model($record)
+            ->operation('edit')
+            ->fill($record->attributesToArray());
     }
 
     public function createRecord(): void
     {
-        $this->recordId = null;
+        if (! $this->resource::canCreate()) {
+            return;
+        }
+
+        $this->resetEditor();
         $this->isActive = true;
-        $this->record = null;
-        $this->form->fill();
     }
 
     public function cancel(): void
     {
-        $this->recordId = null;
-        $this->isActive = false;
-        $this->record = null;
-        $this->form->fill();
+        $this->resetEditor();
         $this->dispatch('panelist-record-cancelled');
     }
 
     public function save(): void
     {
-        $data = $this->form->getState();
-
-        /** @var class-string $resource */
-        $resource = $this->resource;
-
-        if ($this->recordId) {
-            $record = $this->getRecord();
-
-            if (! $record instanceof Model) {
-                return;
-            }
-
-            $record->update($data);
-
-            $this->dispatch('panelist-record-saved', id: $this->recordId);
-
-            Notification::make()
-                ->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))
-                ->success()
-                ->send();
-        } else {
-            $record = $resource::getModel()::create($data);
-
-            /** @var int|string $key */
-            $key = $record->getKey();
-
-            $this->recordId = $key;
-            $this->record = $record;
-
-            $this->dispatch('panelist-record-saved', id: $this->recordId);
-
-            Notification::make()
-                ->title(__('filament-panels::resources/pages/create-record.notifications.created.title'))
-                ->success()
-                ->send();
+        if (! $this->isActive) {
+            return;
         }
+
+        $existingRecord = $this->getRecord();
+        $isCreating = $this->recordId === null;
+
+        abort_unless(
+            $isCreating
+                ? $this->resource::canCreate()
+                : $existingRecord instanceof Model && $this->resource::canEdit($existingRecord),
+            403,
+        );
+
+        try {
+            $this->beginDatabaseTransaction();
+
+            if ($existingRecord instanceof Model) {
+                // With an existing record as the form model, getState() also saves relationships.
+                $record = $this->handleRecordUpdate($existingRecord, $this->form->getState());
+            } else {
+                $record = $this->handleRecordCreation($this->form->getState());
+
+                $this->form->model($record)->saveRelationships();
+            }
+        } catch (Halt $exception) {
+            $exception->shouldRollbackDatabaseTransaction()
+                ? $this->rollBackDatabaseTransaction()
+                : $this->commitDatabaseTransaction();
+
+            return;
+        } catch (Throwable $exception) {
+            $this->rollBackDatabaseTransaction();
+
+            throw $exception;
+        }
+
+        $this->commitDatabaseTransaction();
+
+        /** @var int|string $key */
+        $key = $record->getKey();
+
+        $this->recordId = $key;
+        $this->record = $record;
+        $this->form->operation('edit');
+
+        $this->dispatch('panelist-record-saved', id: $key);
+
+        Notification::make()
+            ->title($isCreating
+                ? __('filament-panels::resources/pages/create-record.notifications.created.title')
+                : __('filament-panels::resources/pages/edit-record.notifications.saved.title'))
+            ->success()
+            ->send();
     }
 
     public function deleteAction(): Action
@@ -153,24 +182,18 @@ class RecordEditor extends Component implements HasActions, HasForms
             ->label(__('filament-actions::delete.single.label'))
             ->color('danger')
             ->size(Size::Small)
+            ->visible(fn (): bool => $this->canDeleteRecord())
             ->requiresConfirmation()
-            ->modalHeading(__('filament-actions::delete.single.modal.heading', ['label' => $this->getModelLabel()]))
+            ->modalHeading(__('filament-actions::delete.single.modal.heading', ['label' => $this->resource::getModelLabel()]))
             ->modalSubmitActionLabel(__('filament-actions::delete.single.modal.actions.delete.label'))
             ->action(function (): void {
-                $record = $this->getRecord();
-
-                if (! $record instanceof Model) {
-                    return;
-                }
+                abort_unless($this->canDeleteRecord(), 403);
 
                 $id = $this->recordId;
 
-                $record->delete();
+                $this->getRecord()?->delete();
 
-                $this->recordId = null;
-                $this->isActive = false;
-                $this->record = null;
-                $this->form->fill();
+                $this->resetEditor();
 
                 $this->dispatch('panelist-record-deleted', id: $id);
 
@@ -181,25 +204,49 @@ class RecordEditor extends Component implements HasActions, HasForms
             });
     }
 
-    public function getNavigationIcon(): string | BackedEnum | \Illuminate\Contracts\Support\Htmlable
+    public function canCreateRecord(): bool
     {
-        /** @var class-string $resource */
-        $resource = $this->resource;
-
-        return $resource::getNavigationIcon() ?? 'heroicon-o-rectangle-stack';
+        return $this->resource::canCreate();
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function getNavigationIcon(): string | BackedEnum | Htmlable
+    {
+        return $this->resource::getNavigationIcon() ?? 'heroicon-o-rectangle-stack';
+    }
+
+    public function render(): View
     {
         return view('panelist::livewire.record-editor');
     }
 
-    protected function getModelLabel(): string
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function handleRecordCreation(array $data): Model
     {
-        /** @var class-string $resource */
-        $resource = $this->resource;
+        $record = new ($this->resource::getModel())($data);
+        $record->save();
 
-        return $resource::getModelLabel();
+        return $record;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $record->update($data);
+
+        return $record;
+    }
+
+    /**
+     * Resolve a record through the resource's route-binding query, which applies
+     * getEloquentQuery() scoping such as tenancy and soft-delete visibility.
+     */
+    protected function resolveRecord(int | string $id): ?Model
+    {
+        return $this->resource::resolveRecordRouteBinding($id);
     }
 
     protected function getRecord(): ?Model
@@ -208,15 +255,29 @@ class RecordEditor extends Component implements HasActions, HasForms
             return $this->record;
         }
 
-        if (! $this->recordId) {
+        if ($this->recordId === null) {
             return null;
         }
 
-        /** @var class-string $resource */
-        $resource = $this->resource;
+        return $this->record = $this->resolveRecord($this->recordId);
+    }
 
-        $this->record = $resource::getModel()::find($this->recordId);
+    protected function canDeleteRecord(): bool
+    {
+        $record = $this->getRecord();
 
-        return $this->record;
+        return $record instanceof Model && $this->resource::canDelete($record);
+    }
+
+    protected function resetEditor(): void
+    {
+        $this->recordId = null;
+        $this->record = null;
+        $this->isActive = false;
+
+        $this->form
+            ->model($this->resource::getModel())
+            ->operation('create')
+            ->fill();
     }
 }

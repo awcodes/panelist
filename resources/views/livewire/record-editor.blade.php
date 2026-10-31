@@ -72,13 +72,15 @@
                 <p class="text-sm">
                     {{ __('panelist::panelist.select_or_create') }}
                 </p>
-                <x-filament::button
-                    wire:click="$dispatch('panelist-create-record')"
-                    size="sm"
-                    color="gray"
-                >
-                    {{ __('filament-panels::resources/pages/create-record.breadcrumb') }}
-                </x-filament::button>
+                @if ($this->canCreateRecord())
+                    <x-filament::button
+                        wire:click="$dispatch('panelist-create-record')"
+                        size="sm"
+                        color="gray"
+                    >
+                        {{ __('filament-panels::resources/pages/create-record.breadcrumb') }}
+                    </x-filament::button>
+                @endif
             </div>
         @endif
     </div>

@@ -61,6 +61,7 @@ abstract class PanelistPage extends Page
         return [
             Action::make('create')
                 ->label(__('filament-actions::create.single.label', ['label' => static::getResource()::getModelLabel()]))
+                ->visible(fn (): bool => static::getResource()::canCreate())
                 ->action(fn () => $this->dispatch('panelist-create-record')),
         ];
     }
