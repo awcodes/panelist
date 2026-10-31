@@ -76,6 +76,9 @@ Keeping the `create` and `edit` pages registered is optional. It lets global sea
 
 The sidebar shows the resource's table as a scrollable, searchable list. Clicking a row opens the record in the editor, where you can save your changes, cancel, or delete the record. The page's create action, and the button in the editor's empty state, open a blank form for a new record.
 
+![The editor showing a blank form for a new post, with Cancel and Create buttons](assets/create-light.png#gh-light-mode-only)
+![The editor showing a blank form for a new post, with Cancel and Create buttons](assets/create-dark.png#gh-dark-mode-only)
+
 The selected record's key is kept in the query string, such as `?record=123`, so the link can be bookmarked or shared and opens the same record. Opening a record, creating one, cancelling and deleting all keep the query string up to date.
 
 Drag the divider between the panels to resize the sidebar, between 200 and 600 pixels wide. Panelist remembers the width in the browser's `localStorage`. The initial width is set by the [`sidebar_width` option](configuration.md).

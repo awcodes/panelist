@@ -18,6 +18,9 @@ Panelist lets you work through records from the keyboard. Shortcuts are enabled 
 
 Moving through the list highlights a row without opening it; press `Enter` or `o` to open the highlighted record in the editor.
 
+![The sidebar list with the open post shaded and the keyboard highlight outlining another row further down](assets/keyboard-navigation-light.png#gh-light-mode-only)
+![The sidebar list with the open post shaded and the keyboard highlight outlining another row further down](assets/keyboard-navigation-dark.png#gh-dark-mode-only)
+
 ## When shortcuts apply
 
 The shortcuts are designed not to get in the way of editing:

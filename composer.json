@@ -1,6 +1,6 @@
 {
     "name": "awcodes/panelist",
-    "description": "A reusable Filament plugin that transforms standard resource CRUD interfaces into a modern editing experience similar to Gmail, Notion, or Linear",
+    "description": "A Filament plugin that turns a resource's list page into a master-detail editor with the record list on the left and the form on the right.",
     "keywords": [
         "awcodes",
         "laravel",

@@ -11,6 +11,9 @@ Panelist reuses the `form()` and `table()` definitions your resource already has
 
 ## How the layout works
 
+![The Panelist layout with a list of posts on the left and the selected post open in the editor on the right](assets/layout-light.png#gh-light-mode-only)
+![The Panelist layout with a list of posts on the left and the selected post open in the editor on the right](assets/layout-dark.png#gh-dark-mode-only)
+
 - **Sidebar list** — the resource's table, shown as a scrollable, searchable list. Clicking a row opens the record in the editor.
 - **Editor** — the resource's form, filled with the selected record, or blank when you create a new one.
 - **Bookmarkable links** — the selected record's key is kept in the query string, such as `?record=123`, so a link opens the same record.
