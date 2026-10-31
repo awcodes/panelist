@@ -1,0 +1,15 @@
+version: 1
+
+title: Panelist
+
+navigation:
+  - index
+  - installation
+
+  - label: Using Panelist
+    children:
+      - usage
+      - keyboard-shortcuts
+      - customizing-the-editor
+
+  - configuration

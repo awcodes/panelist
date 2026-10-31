@@ -180,7 +180,7 @@ When keyboard shortcuts are enabled (the default), the following bindings are av
 | `Cmd / Ctrl + S` | Save the current record                       |
 | `Escape`         | Close the editor without saving               |
 
-Single-key shortcuts are ignored while you type in a field or while a modal is open, so they never interfere with editing. `Cmd / Ctrl + S` works from inside fields. `Escape` closes an open modal or dropdown first, and only closes the editor when focus is outside a field. `Enter` on a focused button presses that button. Browsers reserve `Cmd / Ctrl + N` for a new window, which is why creating uses `c`.
+Single-key shortcuts are ignored while you type in a field or while a modal is open, so they never interfere with editing. `Cmd / Ctrl + S` works from inside fields. `Escape` closes an open modal without closing the editor, and only closes the editor when focus is outside a field. `Enter` on a focused button presses that button. Browsers reserve `Cmd / Ctrl + N` for a new window, which is why creating uses `c`.
 
 Disable them per panel with `->keyboardShortcuts(false)` or globally with the `enable_keyboard_shortcuts` config option.
 
